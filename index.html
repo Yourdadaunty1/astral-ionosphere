@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astral Ionosphere — Celestial Frequency Synthesizer & Telemetry</title>
+    <meta name="description" content="An interactive, minimalist cosmic signal visualizer and ambient frequency generator simulating radio wave propagation through Earth's ionospheric layers.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Application Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Stars Overlay -->
+    <div class="stars-overlay"></div>
+    <div class="glow-radial"></div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo-area">
+                <span class="pulse-indicator"></span>
+                <h1 class="logo-title">ASTRAL IONOSPHERE</h1>
+                <span class="version-badge">v1.2.0-SECURE</span>
+            </div>
+            
+            <div class="live-telemetry-header">
+                <div class="telemetry-stat" id="telemetry-time">
+                    <span class="label">SYS_TIME:</span>
+                    <span class="value">18:12:19 UTC</span>
+                </div>
+                <div class="telemetry-stat">
+                    <span class="label">SOLAR_WIND:</span>
+                    <span class="value" id="solar-wind-val">412.8 km/s</span>
+                </div>
+                <div class="telemetry-stat">
+                    <span class="label">FLUX_INDEX:</span>
+                    <span class="value text-glow-green" id="flux-index-val">142 SFU</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="app-layout">
+            
+            <!-- LEFT COLUMN: CONTROLS -->
+            <section class="control-panel glass-card">
+                <div class="card-header">
+                    <h2><span class="accent-number">01.</span> SIGNAL PARAMETERS</h2>
+                    <span class="status-pill text-glow-blue">RECEIVER ACTIVE</span>
+                </div>
+
+                <!-- Ambient Synthesizer Activation -->
+                <div class="control-group action-group">
+                    <button id="btn-audio-toggle" class="btn-glow" aria-label="Toggle Astral Soundscape">
+                        <span class="btn-icon">⚡</span>
+                        <span class="btn-text">INITIALIZE AUDIO SCAPE</span>
+                    </button>
+                </div>
+
+                <!-- Frequency Slider -->
+                <div class="control-group">
+                    <div class="slider-header">
+                        <label for="slider-freq">Carrier Frequency</label>
+                        <span class="slider-val" id="val-freq">14.20 MHz</span>
+                    </div>
+                    <input type="range" id="slider-freq" min="3" max="30" step="0.1" value="14.2">
+                    <div class="slider-labels">
+                        <span>3.0 MHz (HF)</span>
+                        <span>30.0 MHz</span>
+                    </div>
+                </div>
+
+                <!-- Resonance Slider -->
+                <div class="control-group">
+                    <div class="slider-header">
+                        <label for="slider-resonance">Ionosphere Q-Factor</label>
+                        <span class="slider-val" id="val-resonance">4.5</span>
+                    </div>
+                    <input type="range" id="slider-resonance" min="1" max="15" step="0.1" value="4.5">
+                    <div class="slider-labels">
+                        <span>Low Absorption</span>
+                        <span>High Resonance</span>
+                    </div>
+                </div>
+
+                <!-- Ionization Density -->
+                <div class="control-group">
+                    <div class="slider-header">
+                        <label for="slider-ionization">Electron Density (Ne)</label>
+                        <span class="slider-val" id="val-ionization">1.5e6 cm⁻³</span>
+                    </div>
+                    <input type="range" id="slider-ionization" min="0.1" max="5.0" step="0.05" value="1.5">
+                    <div class="slider-labels">
+                        <span>Solar Minimum</span>
+                        <span>Solar Maximum</span>
+                    </div>
+                </div>
+
+                <!-- Stellar Selector -->
+                <div class="control-group">
+                    <label class="group-label">Stellar Tuning Source</label>
+                    <div class="stellar-grid">
+                        <button class="stellar-btn active" data-source="sun" id="source-sun">
+                            <span class="source-dot sun"></span>
+                            <span class="source-name">SOLAR FLUX</span>
+                        </button>
+                        <button class="stellar-btn" data-source="moon" id="source-moon">
+                            <span class="source-dot moon"></span>
+                            <span class="source-name">LUNAR TIDE</span>
+                        </button>
+                        <button class="stellar-btn" data-source="jupiter" id="source-jupiter">
+                            <span class="source-dot jupiter"></span>
+                            <span class="source-name">JOVIAN DECALS</span>
+                        </button>
+                        <button class="stellar-btn" data-source="pulsar" id="source-pulsar">
+                            <span class="source-dot pulsar"></span>
+                            <span class="source-name">PULSAR PSR B1919</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENTER COLUMN: VISUALIZER -->
+            <section class="visualizer-container glass-card">
+                <div class="card-header">
+                    <h2><span class="accent-number">02.</span> IONOSPHERIC REFRACTION SIMULATOR</h2>
+                    <div class="layer-selector-tabs">
+                        <button class="layer-tab active" data-layer="f" id="tab-f-layer">F-Layer (250km)</button>
+                        <button class="layer-tab" data-layer="e" id="tab-e-layer">E-Layer (110km)</button>
+                        <button class="layer-tab" data-layer="d" id="tab-d-layer">D-Layer (75km)</button>
+                    </div>
+                </div>
+
+                <div class="canvas-wrapper" id="canvas-wrapper">
+                    <!-- Layer Stats Overlay -->
+                    <div class="layer-stats-overlay">
+                        <div class="stat-row"><span class="lbl">Alt:</span><span class="val" id="stat-alt">250 km</span></div>
+                        <div class="stat-row"><span class="lbl">Critical Freq:</span><span class="val" id="stat-fo">9.2 MHz</span></div>
+                        <div class="stat-row"><span class="lbl">Refractive Index:</span><span class="val" id="stat-ri">0.82</span></div>
+                    </div>
+                    <canvas id="canvas-waves"></canvas>
+                    <div class="canvas-help-text">Click and drag to excite radio waves into the ionosphere</div>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: TELEMETRY & LOGGER -->
+            <section class="telemetry-panel glass-card">
+                <div class="card-header">
+                    <h2><span class="accent-number">03.</span> COSMIC DECODER</h2>
+                    <span class="blink-dot"></span>
+                </div>
+
+                <!-- Signal Strengths -->
+                <div class="signal-indicator-list">
+                    <div class="signal-indicator">
+                        <span class="sig-name">SNR (Signal-to-Noise)</span>
+                        <div class="sig-bar-container">
+                            <div class="sig-bar text-glow-blue" id="bar-snr" style="width: 82%;"></div>
+                        </div>
+                        <span class="sig-num" id="val-snr">18.4 dB</span>
+                    </div>
+                    <div class="signal-indicator">
+                        <span class="sig-name">Propagation Reliability</span>
+                        <div class="sig-bar-container">
+                            <div class="sig-bar text-glow-green" id="bar-prop" style="width: 91%;"></div>
+                        </div>
+                        <span class="sig-num" id="val-prop">91%</span>
+                    </div>
+                    <div class="signal-indicator">
+                        <span class="sig-name">Multipath Fading</span>
+                        <div class="sig-bar-container">
+                            <div class="sig-bar text-glow-amber" id="bar-fade" style="width: 24%;"></div>
+                        </div>
+                        <span class="sig-num" id="val-fade">1.2 dB</span>
+                    </div>
+                </div>
+
+                <!-- Telemetry Terminal -->
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <span class="term-title">DECODED_ASCII_STREAM</span>
+                        <button class="btn-mini" id="btn-clear-term" aria-label="Clear Terminal">CLEAR</button>
+                    </div>
+                    <div class="terminal-body" id="terminal-body">
+                        <div class="term-line system-line">[SYSTEM] Terminal initialized. Waiting for carrier wave...</div>
+                        <div class="term-line info-line">[IONO] D-Layer absorbing VLF frequencies.</div>
+                        <div class="term-line success-line">[DECODE] F2 layer reflection stable at 14.2MHz.</div>
+                    </div>
+                </div>
+
+                <!-- Audio Waveform Thumbnail -->
+                <div class="mini-waveform-card">
+                    <div class="waveform-label">REAL-TIME SPECTROGRAM</div>
+                    <div class="mini-canvas-container">
+                        <canvas id="canvas-mini-fft"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <p>Designed for celestial researchers & ambient soundscapes. No cookie tracking. Fully sandboxed.</p>
+            <div class="footer-links">
+                <span class="footer-tag">IONO-REF-4.2</span>
+                <span class="footer-tag">LATENCY: 4.8ms</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
